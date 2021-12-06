@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Daniel James Thorne</Authors>
+    <Company>Meonsoft</Company>
+    <Description>Quick Remote Procedure Calls using BSON and CASTLE Proxies via a common interface implementation.  Still in infancy, this project was a personal response to gRPC being too much fuss.</Description>
+    <Copyright>Daniel James Thorne 2021</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.1.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Core" Version="4.4.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+</Project>
