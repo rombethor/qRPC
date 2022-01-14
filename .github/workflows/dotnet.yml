@@ -20,5 +20,5 @@ jobs:
     - name: Build
       run: dotnet build --no-restore -c Release
     - name: Publish
-      run: dotnet nuget push /qRPC/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate --no-symbols
+      run: dotnet nuget push /qRPC/bin/Release/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate --no-symbols true
       
