@@ -56,30 +56,6 @@ namespace qRPC.Server
             {
                 var client = await tcp.AcceptTcpClientAsync(cancellationToken);
                 ThreadPool.QueueUserWorkItem(ProcessRequest, client);
-                //tasks.Add(ProcessRequest(client, cancellationToken));
-                //using (NetworkStream stream = client.GetStream())
-                //{
-                //    try
-                //    {
-                //        while(client.Connected && client.Available == 0)
-                //        {
-                //        }
-                //        if(client.Connected)
-                //        {
-                //            var message = stream.ReadObjectFromStream<QrpcRequest>(_encoding);
-
-                //            object response = ExecuteTask(message.MethodName, message.Arguments);
-
-                //            stream.WriteObjectToStream(response, _encoding);
-                //            stream.Flush();
-                //        }
-                //        client.Close();
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        Console.WriteLine(ex);
-                //    }
-                //}
             }
             tcp.Stop();
         }
