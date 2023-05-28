@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
 using qRPC.Transport;
@@ -50,10 +51,11 @@ namespace qRPC.Client
             using (TcpClient tcp = new TcpClient(_hostname, _port) { ReceiveTimeout = 30000 })
             {
                 var stream = tcp.GetStream();
-                var message = new Transport.QrpcRequest()
+                
+                var message = new QrpcRequest()
                 {
                     MethodName = invocation.Method.Name,
-                    Arguments = invocation.Arguments
+                    Arguments = invocation.Arguments.Select(a => JsonSerializer.Serialize(a)).ToArray()
                 };
 
                 //stream.WriteObjectToStream(message, _encoding);

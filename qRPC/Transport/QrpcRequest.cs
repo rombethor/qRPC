@@ -7,7 +7,7 @@ namespace qRPC.Transport
     public class QrpcRequest
     {
         public string MethodName { get; set; }
-        public object[] Arguments { get; set; }
+        public string[] Arguments { get; set; }
     }
 }
  
