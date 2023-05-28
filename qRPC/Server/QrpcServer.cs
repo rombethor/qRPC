@@ -85,9 +85,7 @@ namespace qRPC.Server
                     }
                     catch(Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
-                        Console.WriteLine($"Occurred on method: {message.MethodName}");
-                        Console.WriteLine($"Args: {string.Join('|', message.Arguments)}");
+                        throw new MethodProcessingException(ex, message.MethodName, message.Arguments);
                     }
 
                 }
