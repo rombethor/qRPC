@@ -8,7 +8,7 @@
     <Description>Quick Remote Procedure Calls using BSON and CASTLE Proxies via a common interface implementation.  Still in infancy, this project was a personal response to gRPC being too much fuss.</Description>
     <Copyright>Daniel James Thorne 2021</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>6.1.1</Version>
+    <Version>6.2.1</Version>
     <RepositoryUrl>https://github.com/rombethor/qRPC</RepositoryUrl>
     <PackageProjectUrl>https://github.com/rombethor/qRPC</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
