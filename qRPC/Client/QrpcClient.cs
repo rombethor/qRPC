@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
 using qRPC.Transport;
@@ -61,18 +62,23 @@ namespace qRPC.Client
                 //stream.WriteObjectToStream(message, _encoding);
 
                 stream.WriteObjectToStream(message, _encoding);
-                    
-                    while (tcp.Available == 0 && tcp.Connected)
-                    { }
-                    object obj = null;
-                    if(tcp.Connected)
-                    {
-                        
-                        obj = stream.ReadObjectFromStream(_encoding, invocation.Method.ReturnType);
-                    }
 
-                    tcp.Close();
-                    return obj;
+                int checks = 0;
+                while ((tcp.Available == 0 || !tcp.Connected) && checks <= 10)
+                {
+                    checks++;
+                    Task.Delay(100).Wait();
+                }
+                object obj = null;
+                if (tcp.Connected)
+                {
+                    obj = stream.ReadObjectFromStream(_encoding, invocation.Method.ReturnType);
+                }
+                else
+                    throw new TimeoutException("qRPC Client timed out.  Status is disconnected.");
+
+                tcp.Close();
+                return obj;
             }
 
         }
