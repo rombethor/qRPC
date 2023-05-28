@@ -9,7 +9,17 @@
     <Copyright>Daniel James Thorne 2021</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>6.1.1</Version>
+    <RepositoryUrl>https://github.com/rombethor/qRPC</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/rombethor/qRPC</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="5.1.0" />
