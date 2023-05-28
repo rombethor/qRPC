@@ -69,6 +69,8 @@ namespace qRPC.Server
                 int attempts = 0;
                 while (client.Connected && client.Available == 0 && attempts < 10)
                 {
+                    Thread.Sleep(100);
+                    attempts++;
                 }
                 if (client.Connected)
                 {
