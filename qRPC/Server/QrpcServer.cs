@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
@@ -66,17 +67,27 @@ namespace qRPC.Server
             using NetworkStream stream = client.GetStream();
             try
             {
-                while (client.Connected && client.Available == 0)
+                int attempts = 0;
+                while (client.Connected && client.Available == 0 && attempts < 10)
                 {
+                    Thread.Sleep(100);
+                    attempts++;
                 }
                 if (client.Connected)
                 {
                     var message = stream.ReadObjectFromStream<QrpcRequest>(_encoding);
 
-                    object response = ExecuteTask(message.MethodName, message.Arguments);
+                    try
+                    {
+                        object response = ExecuteTask(message.MethodName, message.Arguments);
+                        stream.WriteObjectToStream(response, _encoding);
+                        stream.Flush();
+                    }
+                    catch(Exception ex)
+                    {
+                        throw new MethodProcessingException(ex, message.MethodName, message.Arguments);
+                    }
 
-                    stream.WriteObjectToStream(response, _encoding);
-                    stream.Flush();
                 }
                 client.Close();
             }
@@ -95,22 +106,16 @@ namespace qRPC.Server
             if (args.Length < parameters.Where(p => !p.IsOptional).Count())
                 throw new ArgumentException("The number of arguments provided doesn't fulfill the method requirements");
 
+            List<object?> passArgs = new();
+
             for(int i = 0; i < parameters.Count(); i++)
             {
-                if (parameters[i].ParameterType == typeof(Guid))
-                    args[i] = Guid.Parse(args[i].ToString());
-                //if (parameters[i].ParameterType == typeof(string))
-                //    args[i] = args[i].ToString();
-                //if (parameters[i].ParameterType == typeof(double))
-                //    args[i] = double.Parse(args[i].ToString());
-                else
-                {
-                    args[i] = Convert.ChangeType(args[i].ToString(), parameters[i].ParameterType); 
-                }
+                Type paramType = parameters[i].ParameterType;
+                passArgs.Add(JsonSerializer.Deserialize(args[i].ToString(), paramType));
             }
 
             var method = typeof(T).GetMethod(methodName);
-            var ret = method.Invoke(_target, args);
+            var ret = method.Invoke(_target, passArgs.ToArray());
 
 
             return ret; // method.Invoke(_target, args);

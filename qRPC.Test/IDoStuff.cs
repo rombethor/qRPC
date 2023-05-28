@@ -21,5 +21,7 @@ namespace qRPC.Test
         public Guid GetAGuid();
 
         public DateTime GetNow();
+
+        public TestModel ManageModel(TestModel model);
     }
 }
