@@ -66,7 +66,8 @@ namespace qRPC.Server
             using NetworkStream stream = client.GetStream();
             try
             {
-                while (client.Connected && client.Available == 0)
+                int attempts = 0;
+                while (client.Connected && client.Available == 0 && attempts < 10)
                 {
                 }
                 if (client.Connected)
