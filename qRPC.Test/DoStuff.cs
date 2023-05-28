@@ -45,5 +45,16 @@ namespace qRPC.Test
         {
             return DateTime.UtcNow;
         }
+
+        public TestModel ManageModel(TestModel model)
+        {
+            if (model == null)
+                throw new NullReferenceException();
+            return new TestModel()
+            {
+                Label = $"model: {model.Number}",
+                Number = model.Number++
+            };
+        }
     }
 }

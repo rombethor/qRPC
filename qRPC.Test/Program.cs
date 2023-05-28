@@ -37,6 +37,10 @@ namespace qRPC.Test
 
                 var d = Task.Run(() => client.Remote.HiWorld("Son"));
 
+                var e = client.Remote.WhatIsMyNumber("Gem", 478);
+                Console.WriteLine(e);
+                Console.WriteLine($"{(DateTime.UtcNow - start).TotalSeconds}s");
+
                 var x = Task.Run(() => client.Remote.TryAGuid(Guid.NewGuid()));
 
                 Console.WriteLine(res.Result);
@@ -60,10 +64,14 @@ namespace qRPC.Test
                 Console.WriteLine($"Number of ticks: {ticks}");
                 Console.WriteLine($"{(DateTime.UtcNow - start).TotalSeconds}s");
 
-                var e = client.Remote.WhatIsMyNumber("Gem", 478);
-                Console.WriteLine(e);
-                Console.WriteLine($"{(DateTime.UtcNow - start).TotalSeconds}s");
 
+                var model = client.Remote.ManageModel(new TestModel()
+                {
+                    Label = "borrar",
+                    Number = 7
+                });
+
+                Console.WriteLine($"Model sent, label received: {model.Label}");
 
                 client.Remote.NotImplemented();
             }
