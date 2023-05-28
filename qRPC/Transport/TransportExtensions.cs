@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 
 namespace qRPC.Transport
 {
@@ -12,7 +12,7 @@ namespace qRPC.Transport
         {
             using(var bw = new BinaryWriter(stream, encoding, true))
             {
-                bw.Write(JsonConvert.SerializeObject(obj));
+                bw.Write(JsonSerializer.Serialize(obj));
                 bw.Flush();
             }
         }
@@ -24,7 +24,7 @@ namespace qRPC.Transport
             data = br.ReadString();
             if (T == typeof(void))
                 return default;
-            return JsonConvert.DeserializeObject(data,T);
+            return JsonSerializer.Deserialize(data,T);
         }
 
         public static T ReadObjectFromStream<T>(this Stream stream, Encoding encoding)
@@ -36,7 +36,7 @@ namespace qRPC.Transport
             if (typeof(T) == typeof(void))
                 return default;
 
-            return JsonConvert.DeserializeObject<T>(data);
+            return JsonSerializer.Deserialize<T>(data);
         }
     }
 }
