@@ -27,21 +27,21 @@ namespace qRPC.Server
 
         CancellationTokenSource cts;
 
-        public QrpcServer(T target, string hostname, int port, Encoding encoding) 
+        public QrpcServer(T target, int port, Encoding encoding) 
         {
-            Setup(target, hostname, port, encoding);
+            Setup(target, port, encoding);
         }
 
-        public QrpcServer(TargetDelegate targetDelegate, string hostname, int port, Encoding encoding) 
+        public QrpcServer(TargetDelegate targetDelegate, int port, Encoding encoding) 
         {
-            Setup(targetDelegate.Invoke(), hostname, port, encoding);
+            Setup(targetDelegate.Invoke(), port, encoding);
         }
 
-        void Setup(T target, string host, int port, Encoding encoding)
+        void Setup(T target, int port, Encoding encoding)
         {
             _target = target;
             _encoding = encoding;
-            tcp = new TcpListener(IPAddress.Parse(host), port);
+            tcp = new TcpListener(IPAddress.Any, port);
             tcp.Start();
             cts = new CancellationTokenSource();
             listening = Listen(cts.Token);
@@ -54,34 +54,38 @@ namespace qRPC.Server
             //Listen for connections
             while(!cancellationToken.IsCancellationRequested)
             {
-                var client = await tcp.AcceptTcpClientAsync();
-                using (NetworkStream stream = client.GetStream())
-                {
-                    try
-                    {
-                        while(client.Connected && client.Available == 0)
-                        {
-                        }
-                        if(client.Connected)
-                        {
-                            var message = stream.ReadObjectFromStream<QrpcRequest>(_encoding);
-
-                            object response = ExecuteTask(message.MethodName, message.Arguments);
-
-                            stream.WriteObjectToStream(response, _encoding);
-                            stream.Flush();
-                        }
-                        client.Close();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-                }
+                var client = await tcp.AcceptTcpClientAsync(cancellationToken);
+                ThreadPool.QueueUserWorkItem(ProcessRequest, client);
             }
             tcp.Stop();
         }
         
+        private void ProcessRequest(object objClient)
+        {
+            TcpClient client = (TcpClient)objClient;
+            using NetworkStream stream = client.GetStream();
+            try
+            {
+                while (client.Connected && client.Available == 0)
+                {
+                }
+                if (client.Connected)
+                {
+                    var message = stream.ReadObjectFromStream<QrpcRequest>(_encoding);
+
+                    object response = ExecuteTask(message.MethodName, message.Arguments);
+
+                    stream.WriteObjectToStream(response, _encoding);
+                    stream.Flush();
+                }
+                client.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
         public object ExecuteTask(string methodName, params object[] args)
         {
             var methodInfo = typeof(T).GetMethod(methodName);
@@ -95,7 +99,14 @@ namespace qRPC.Server
             {
                 if (parameters[i].ParameterType == typeof(Guid))
                     args[i] = Guid.Parse(args[i].ToString());
-                args[i] = Convert.ChangeType(args[i], parameters[i].ParameterType); 
+                //if (parameters[i].ParameterType == typeof(string))
+                //    args[i] = args[i].ToString();
+                //if (parameters[i].ParameterType == typeof(double))
+                //    args[i] = double.Parse(args[i].ToString());
+                else
+                {
+                    args[i] = Convert.ChangeType(args[i].ToString(), parameters[i].ParameterType); 
+                }
             }
 
             var method = typeof(T).GetMethod(methodName);

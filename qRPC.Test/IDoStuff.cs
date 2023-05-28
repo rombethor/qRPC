@@ -20,5 +20,6 @@ namespace qRPC.Test
 
         public Guid GetAGuid();
 
+        public DateTime GetNow();
     }
 }

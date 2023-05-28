@@ -7,7 +7,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using Castle.DynamicProxy;
-using Newtonsoft.Json;
 using qRPC.Transport;
 
 namespace qRPC.Client

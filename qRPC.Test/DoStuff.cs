@@ -41,5 +41,9 @@ namespace qRPC.Test
             return Guid.NewGuid();
         }
 
+        public DateTime GetNow()
+        {
+            return DateTime.UtcNow;
+        }
     }
 }
