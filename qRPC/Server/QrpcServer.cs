@@ -20,6 +20,8 @@ namespace qRPC.Server
     {
         T _target;
 
+        string _encryptionKey;
+
         public delegate T TargetDelegate();
 
         Task listening;
@@ -50,6 +52,11 @@ namespace qRPC.Server
 
         //Proxy not required for server.  Just use Reflection.
 
+        public void SetEncryptionKey(string key)
+        {
+            _encryptionKey = key;
+        }
+
         public async Task Listen(CancellationToken cancellationToken)
         {
             //Listen for connections
@@ -75,12 +82,12 @@ namespace qRPC.Server
                 }
                 if (client.Connected)
                 {
-                    var message = stream.ReadObjectFromStream<QrpcRequest>(_encoding);
+                    var message = stream.ReadObjectFromStream<QrpcRequest>(_encoding, _encryptionKey);
 
                     try
                     {
                         object response = ExecuteTask(message.MethodName, message.Arguments);
-                        stream.WriteObjectToStream(response, _encoding);
+                        stream.WriteObjectToStream(response, _encoding, _encryptionKey);
                         stream.Flush();
                     }
                     catch(Exception ex)
@@ -117,8 +124,7 @@ namespace qRPC.Server
             var method = typeof(T).GetMethod(methodName);
             var ret = method.Invoke(_target, passArgs.ToArray());
 
-
-            return ret; // method.Invoke(_target, args);
+            return ret;
         }
 
         public void Dispose()
