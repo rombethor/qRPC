@@ -37,7 +37,17 @@ var joinedString = client.RemoteConcat("Hello", " World");
 Console.WriteLine(joinedString); //Gives us "Hello World"
 ```
 
+## Encryption
+
+As for version 6.3.0, symmetric encryption is provided by AES.
+
+To enable encryption, `SetEncryptionKey(string key)` must be called on both the client and server
+providing the same `key`.
+
+Note that this is not really safe for scenarios where the preshared key is in the public domain, or a
+public client.  It is supposed to stop snooping from server-to-server.  A more public-domain friendly 
+solution may be added later.
+
 ## Coming (hopefully) soon:
 
- - Encryption/Security
  - ServiceCollection registration
