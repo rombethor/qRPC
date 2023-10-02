@@ -18,6 +18,7 @@ namespace qRPC.Client
         readonly int _port;
         readonly string _hostname;
         readonly Encoding _encoding;
+        string _encryptionKey = null;
         public QrpcClient(int port, string hostname, Encoding encoding)
         {
             _port = port;
@@ -59,9 +60,7 @@ namespace qRPC.Client
                     Arguments = invocation.Arguments.Select(a => JsonSerializer.Serialize(a)).ToArray()
                 };
 
-                //stream.WriteObjectToStream(message, _encoding);
-
-                stream.WriteObjectToStream(message, _encoding);
+                stream.WriteObjectToStream(message, _encoding, _encryptionKey);
 
                 int checks = 0;
                 while ((tcp.Available == 0 || !tcp.Connected) && checks <= 10)
@@ -72,7 +71,7 @@ namespace qRPC.Client
                 object obj = null;
                 if (tcp.Connected)
                 {
-                    obj = stream.ReadObjectFromStream(_encoding, invocation.Method.ReturnType);
+                    obj = stream.ReadObjectFromStream(_encoding, invocation.Method.ReturnType, _encryptionKey);
                 }
                 else
                     throw new TimeoutException("qRPC Client timed out.  Status is disconnected.");
@@ -81,6 +80,11 @@ namespace qRPC.Client
                 return obj;
             }
 
+        }
+
+        public void SetEncryptionKey(string key)
+        {
+            _encryptionKey = key;
         }
 
     }
